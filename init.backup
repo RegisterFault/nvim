@@ -1,0 +1,157 @@
+call plug#begin('~/.vim/plugged')
+Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-fugitive'
+Plug 'vim-scripts/repmo.vim'
+Plug 'tomasr/molokai'
+Plug 'morhetz/gruvbox'
+"Plug 'dense-analysis/ale'
+Plug 'jeetsukumaran/vim-pythonsense'
+Plug 'tpope/vim-commentary'
+Plug 'fatih/vim-go'
+Plug 'preservim/tagbar'
+Plug 'neoclide/coc.nvim', {'branch': 'v0.0.82'}
+Plug 'hashivim/vim-terraform'
+"Plug 'm-kat/aws-vim'
+" Plug 'roxma/nvim-yarp'
+" Plug 'roxma/vim-hug-neovim-rpc'
+" Plug 'Shougo/deoplete.nvim'
+"Plug 'sheerun/vim-polyglot'
+"Plug 'brookhong/cscope.vim'
+call plug#end()
+
+"deoplete stuff
+"	Make sure to have: msgpack and pynvim from python-pip, and make sure
+"	has('python3') returns 1
+" let g:deoplete#enable_at_startup = 1
+" call deoplete#custom#option('omni_patterns', { 'go': '[^. *\t]\.\w*' })
+" autocmd CompleteDone * silent! pclose!
+
+"Terraform stuff
+let g:terraform_fmt_on_save=1
+let g:terraform_align=1
+
+" Use K to show documentation in preview window.
+"nnoremap <silent> K :call <SID>show_documentation()<CR>
+"
+"function! s:show_documentation()
+"  if (index(['vim','help'], &filetype) >= 0)
+"    execute 'h '.expand('<cword>')
+"  elseif (coc#rpc#ready())
+"    call CocActionAsync('doHover')
+"  else
+"    execute '!' . &keywordprg . " " . expand('<cword>')
+"  endif
+"endfunction
+
+let g:coc_snippet_next = '<c-l>'
+let g:coc_snippet_prev = '<c-h>'
+nnoremap <silent><expr> <c-j> coc#float#has_scroll() ? coc#float#scroll(1, 1) : "\<c-j>"
+nnoremap <silent><expr> <c-k> coc#float#has_scroll() ? coc#float#scroll(0, 1) : "\<c-k>"
+inoremap <silent><expr> <c-j> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1, 1)\<cr>" : "\<c-j>"
+inoremap <silent><expr> <c-k> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0, 1)\<cr>" : "\<c-k>"
+vnoremap <silent><expr> <c-j> coc#float#has_scroll() ? coc#float#scroll(1, 1) : "\<c-j>"
+vnoremap <silent><expr> <c-k> coc#float#has_scroll() ? coc#float#scroll(0, 1) : "\<c-k>"
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <NUL> coc#refresh()
+
+filetype plugin indent on
+syntax enable
+set tabstop=4
+set shiftwidth=4
+set noexpandtab
+" need both number and relative numer for hybrid mode
+set number
+set relativenumber
+"set tw=150
+set colorcolumn=80
+set showcmd
+set wildmenu
+set wildmode=longest,list,full
+set showmatch
+set incsearch
+set hlsearch
+set belloff=all
+map ]q :cnext
+map [q :cprev
+hi folded ctermbg=black
+let mapleader=','
+set cinoptions=:0,l1,g0,t0,(0
+map <S-Up> <C-Y>
+map <S-Down> <C-E>
+
+"Colors
+set background=dark
+set t_Co=256
+colorscheme molokai
+
+"folding
+set foldenable
+set foldlevelstart=10
+set foldmethod=syntax
+au BufNewFile,BufRead *.py set foldmethod=indent
+
+"vimdiff configs
+if &diff
+	set cursorline
+	map ] ]c
+	map [ [c
+	"hi DiffAdd    ctermfg=233 ctermbg=LightGreen guifg=#003300 guibg=#DDFFDD gui=none cterm=none
+    "hi DiffChange ctermbg=white  guibg=#ececec gui=none   cterm=none
+    "hi DiffText   ctermfg=233  ctermbg=yellow  guifg=#000033 guibg=#DDDDFF gui=none cterm=none
+endif
+"space errors
+highlight default link SpaceError ErrorMsg
+syn match SpaceError / \+\ze\t/     " spaces before tab
+"autocmd InsertEnter * match SpaceError /\%>100v[^()\{\}\[\]<>]\+/ "100 or more
+autocmd InsertLeave * match SpaceError /\s\+$/
+
+
+"auto recognize cloudformation
+au BufRead,BufNewFile *.template.yaml call SetCloudFormationOptions()
+function SetCloudFormationOptions()
+	setlocal filetype=yaml.cloudformation
+	setlocal foldmethod=indent
+endfunction
+if &diff
+    map <leader>1 :diffget LOCAL<CR>
+    map <leader>2 :diffget BASE<CR>
+    map <leader>3 :diffget REMOTE<CR>
+endif
+
+nmap <F8> :TagbarToggle<CR>
+nmap <C-i> :GoInfo<CR>
+
+" Cscope mappings
+" s: Find this C symbol
+" g: Find this definition
+" d: Find functions called by this function
+" c: Find functions calling this function
+" t: Find this text string
+" e: Find this egrep pattern
+" f: Find this file
+" i: Find files #including this file
+nnoremap  <leader>fs :cscope find s <cword><CR>
+snoremap  <leader>fg :cscope find g <cword><CR>
+nnoremap  <leader>fd :cscope find d <cword><CR>
+nnoremap  <leader>fc :cscope find c <cword><CR>
+nnoremap  <leader>ft :cscope find t <cword><CR>
+nnoremap  <leader>fe :cscope find e <cword><CR>
+nnoremap  <leader>ff :cscope find f <cword><CR>
+nnoremap  <leader>fi :cscope find i <cword><CR>
+
+function Clearnum ()
+	set nonumber
+	set norelativenumber
+endfunction
+
+function Enablenum()
+	set number
+	set relativenumber
+endfunction
+
+command Clearnum call Clearnum()
+command Enablenum call Enablenum()
+autocmd VimEnter * NERDTree | wincmd p
